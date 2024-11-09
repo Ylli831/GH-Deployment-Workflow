@@ -15,6 +15,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3  # Use latest version to avoid deprecated warning
 
+    - name: Set up Node.js 20
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'  # Specify Node.js version 20
+
     - name: Set up Git
       run: |
         git config --global user.name "GitHub Actions"
@@ -22,7 +27,7 @@ jobs:
 
     - name: Deploy to GitHub Pages
       run: |
-        git remote set-url origin https://github.com/<username>/<repository>.git
+        git remote set-url origin https://github.com/Ylli831/GH-Deployment-Workflow
         git add -A
         git commit -m "Deploy updates"
         git push origin main:gh-pages
