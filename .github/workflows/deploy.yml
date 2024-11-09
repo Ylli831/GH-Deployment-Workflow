@@ -1,5 +1,4 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
     branches:
@@ -10,27 +9,34 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Git
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "github-actions@github.com"
-
-    - name: Check for changes to deploy
-      run: |
-        git diff --exit-code || echo "Changes detected, ready to deploy"
-      continue-on-error: true
-
+      uses: actions/checkout@v4
+    
     - name: Deploy to GitHub Pages
       run: |
-        git remote set-url origin https://github.com/Ylli831/GH-Deployment-Workflow.git
-        git add -A
-        git diff --exit-code || git commit -m "Deploy updates"
-        git push origin main:gh-pages
+        # Create and switch to gh-pages branch if it doesn't exist
+        git checkout -b gh-pages || git checkout gh-pages
+        
+        # Ensure we have the latest changes
+        git merge main
+        
+        # Push to gh-pages branch
+        git push -f origin gh-pages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Configure GitHub Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
