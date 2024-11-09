@@ -11,19 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write      # Add this permission
+      id-token: write   # Add this permission
+    
+    # Add this environment configuration
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
     - name: Deploy to GitHub Pages
       run: |
-        # Create and switch to gh-pages branch if it doesn't exist
         git checkout -b gh-pages || git checkout gh-pages
-        
-        # Ensure we have the latest changes
         git merge main
-        
-        # Push to gh-pages branch
         git push -f origin gh-pages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,6 +40,7 @@ jobs:
         path: '.'
 
     - name: Deploy to GitHub Pages
+      id: deployment  # Add this ID to reference in the environment url
       uses: actions/deploy-pages@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
